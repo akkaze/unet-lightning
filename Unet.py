@@ -57,14 +57,10 @@ class Unet(pl.LightningModule):
                 # [?, C, H, W]
                 diffY = x2.size()[2] - x1.size()[2]
                 diffX = x2.size()[3] - x1.size()[3]
-                print(x1.size())
-                print(x2.size())
-
 
                 x1 = F.pad(x1, [diffX // 2, diffX - diffX // 2,
                                 diffY // 2, diffY - diffY // 2])
                 x = torch.cat([x2, x1], dim=1) ## why 1?
-                print(x.size())
                 return self.conv(x)
 
         self.inc = double_conv(self.n_channels, 64)
@@ -104,8 +100,9 @@ class Unet(pl.LightningModule):
     @pl.data_loader
     def train_dataloader(self):
         return DataLoader(DirDataset('./dataset/carvana/train', './dataset/carvana/train_masks'),
-                          shuffle=True, pin_memory=True)
-                          # shuffle=True)
+                          batch_size=1,
+                          pin_memory=True,
+                          shuffle=True)
 
     @staticmethod
     def add_model_specific_args(parent_parser):

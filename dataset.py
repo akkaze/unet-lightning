@@ -54,5 +54,5 @@ class DirDataset(Dataset):
         img = self.preprocess(img)
         mask = self.preprocess(mask)
 
-        return torch.from_numpy(img), \
-            torch.from_numpy(mask)
+        return torch.from_numpy(img).float(), \
+            torch.from_numpy(mask).float()
