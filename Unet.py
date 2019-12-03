@@ -10,18 +10,18 @@ import torchvision.transforms as transforms
 from torch import optim
 from torch.utils.data import DataLoader
 from torch.utils.data.distributed import DistributedSampler
-from torchvision.datasets import MNIST
 
 import pytorch_lightning as pl
-from pytorch_lightning.core.lightning import LightningModule
+
+from dataset import DirDataset
 
 
 class Unet(pl.LightningModule):
-    def __init__(self, n_channels, n_classes, bilinear=True):
+    def __init__(self, hparams):
         super(Unet, self).__init__()
-        self.n_channels = n_channels
-        self.n_classes = n_classes
-        self.bilinear = bilinear
+        self.n_channels = hparams.n_channels
+        self.n_classes = hparams.n_classes
+        self.bilinear = True
 
         def double_conv(in_channels, out_channels):
             return nn.Sequential(
@@ -39,8 +39,10 @@ class Unet(pl.LightningModule):
                 double_conv(in_channels, out_channels)
             )
 
-        def up(nn.Module):
-            def __init__(self, in_channels, out_channels):
+        class up(nn.Module):
+            def __init__(self, in_channels, out_channels, bilinear=True):
+                super().__init__()
+
                 if bilinear:
                     self.up = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
                 else:
@@ -65,7 +67,7 @@ class Unet(pl.LightningModule):
                 print(x.size())
                 return self.conv(x)
 
-        self.inc = double_conv(n_channels, 64)
+        self.inc = double_conv(self.n_channels, 64)
         self.down1 = down(64, 128)
         self.down2 = down(128, 256)
         self.down3 = down(256, 512)
@@ -74,7 +76,7 @@ class Unet(pl.LightningModule):
         self.up2 = up(512, 128)
         self.up3 = up(256, 64)
         self.up4 = up(128, 64)
-        self.out = nn.Conv2d(64, n_classes, kernel_size=1)
+        self.out = nn.Conv2d(64, self.n_classes, kernel_size=1)
 
     def forward(self, x):
         x1 = self.inc(x)
@@ -97,8 +99,18 @@ class Unet(pl.LightningModule):
         return {'loss': loss, 'log': tensorboard_logs}
 
     def configure_optimizers(self):
-        return torch.optim.RMSProp(self.parameters(), lr=0.1, weight_decay=1e-8)
+        return torch.optim.RMSprop(self.parameters(), lr=0.1, weight_decay=1e-8)
 
     @pl.data_loader
     def train_dataloader(self):
-        # return DataLoader()
+        return DataLoader(DirDataset('./dataset/carvana/train', './dataset/carvana/train_masks'),
+                          shuffle=True, pin_memory=True)
+                          # shuffle=True)
+
+    @staticmethod
+    def add_model_specific_args(parent_parser):
+        parser = ArgumentParser(parents=[parent_parser])
+
+        parser.add_argument('--n_channels', default=3)
+        parser.add_argument('--n_classes', default=1)
+        return parser
