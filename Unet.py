@@ -87,3 +87,18 @@ class Unet(pl.LightningModule):
         x = self.up3(x, x2)
         x = self.up4(x, x1)
         return self.out(x)
+
+    def training_step(self, batch, batch_nb):
+        x, y = batch
+        y_hat = self.forward(x)
+        loss = F.cross_entropy(y_hat, y) if self.n_classes > 1 else \
+            F.binary_cross_entropy(y_hat, y)
+        tensorboard_logs = {'train_loss': loss}
+        return {'loss': loss, 'log': tensorboard_logs}
+
+    def configure_optimizers(self):
+        return torch.optim.RMSProp(self.parameters(), lr=0.1, weight_decay=1e-8)
+
+    @pl.data_loader
+    def train_dataloader(self):
+        # return DataLoader()
