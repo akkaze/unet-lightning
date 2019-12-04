@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.transforms as transforms
 from torch import optim
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, random_split
 from torch.utils.data.distributed import DistributedSampler
 
 import pytorch_lightning as pl
@@ -95,15 +95,41 @@ class Unet(pl.LightningModule):
         tensorboard_logs = {'train_loss': loss}
         return {'loss': loss, 'log': tensorboard_logs}
 
+    def validation_step(self, batch, batch_nb):
+        x, y = batch
+        y_hat = self.forward(x)
+        loss = F.cross_entropy(y_hat, y) if self.n_classes > 1 else \
+            F.binary_cross_entropy_with_logits(y_hat, y)
+        return {'val_loss': loss}
+
+    def validation_end(self, outputs):
+        avg_loss = torch.stack([x['val_loss'] for x in outputs]).mean()
+        tensorboard_logs = {'val_loss': avg_loss}
+        return {'avg_val_loss': avg_loss, 'log': tensorboard_logs}
+
     def configure_optimizers(self):
         return torch.optim.RMSprop(self.parameters(), lr=0.1, weight_decay=1e-8)
 
+    def __dataloader(self):
+        dataset = DirDataset('./dataset/carvana/train', './dataset/carvana/train_masks')
+        n_val = int(len(dataset) * 0.1)
+        n_train = len(dataset) - n_val
+        train_ds, val_ds = random_split(dataset, [n_train, n_val])
+        train_loader = DataLoader(train_ds, batch_size=1, pin_memory=True, shuffle=True)
+        val_loader = DataLoader(val_ds, batch_size=1, pin_memory=True, shuffle=False)
+
+        return {
+            'train': train_loader,
+            'val': val_loader,
+        }
+
     @pl.data_loader
     def train_dataloader(self):
-        return DataLoader(DirDataset('./dataset/carvana/train', './dataset/carvana/train_masks'),
-                          batch_size=1,
-                          pin_memory=True,
-                          shuffle=True)
+        return self.__dataloader()['train']
+
+    @pl.data_loader
+    def val_dataloader(self):
+        return self.__dataloader()['val']
 
     @staticmethod
     def add_model_specific_args(parent_parser):
