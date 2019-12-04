@@ -90,7 +90,8 @@ class Unet(pl.LightningModule):
         x, y = batch
         y_hat = self.forward(x)
         loss = F.cross_entropy(y_hat, y) if self.n_classes > 1 else \
-            F.binary_cross_entropy(y_hat, y)
+            F.binary_cross_entropy_with_logits(y_hat, y)
+        # loss = F.cross_entropy(y_hat, y)
         tensorboard_logs = {'train_loss': loss}
         return {'loss': loss, 'log': tensorboard_logs}
 

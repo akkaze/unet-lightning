@@ -34,7 +34,7 @@ class DirDataset(Dataset):
         # hwc to chw
         _img = _img.transpose((2, 0, 1))
         if _img.max() > 1:
-            _img =  _img / 255.
+            _img = _img / 255.
         return _img
 
     def __getitem__(self, i):
