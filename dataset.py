@@ -14,7 +14,10 @@ class DirDataset(Dataset):
         self.mask_dir = mask_dir
         self.scale = scale
 
-        self.ids = [s.split('.')[0] for s in os.listdir(self.img_dir)]
+        try:
+            self.ids = [s.split('.')[0] for s in os.listdir(self.img_dir)]
+        except FileNotFoundError:
+            self.ids = []
 
     def __len__(self):
         return len(self.ids)

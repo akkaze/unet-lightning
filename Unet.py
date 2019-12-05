@@ -19,6 +19,8 @@ from dataset import DirDataset
 class Unet(pl.LightningModule):
     def __init__(self, hparams):
         super(Unet, self).__init__()
+        self.hparams = hparams
+
         self.n_channels = hparams.n_channels
         self.n_classes = hparams.n_classes
         self.bilinear = True
