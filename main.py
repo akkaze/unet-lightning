@@ -20,8 +20,6 @@ def main(hparams):
 
 if __name__ == '__main__':
     parent_parser = ArgumentParser(add_help=False)
-    parent_parser.add_argument('--phase', default='train')
-
     parser = Unet.add_model_specific_args(parent_parser)
     hparams = parser.parse_args()
 
