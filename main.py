@@ -18,10 +18,6 @@ def main(hparams):
     trainer.fit(model)
 
 
-def test(hparams):
-    pass
-
-
 if __name__ == '__main__':
     parent_parser = ArgumentParser(add_help=False)
     parent_parser.add_argument('--phase', default='train')
@@ -29,7 +25,4 @@ if __name__ == '__main__':
     parser = Unet.add_model_specific_args(parent_parser)
     hparams = parser.parse_args()
 
-    if hparams.phase == 'test':
-        test(hparams)
-    else:
-        main(hparams)
+    main(hparams)
