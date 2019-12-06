@@ -4,6 +4,6 @@ channels:
 dependencies:
   - pytorch
   - torchvision
-    cudatoolkit=10.1
-    - pip:
-      - pytorch_lightning
+  - cudatoolkit=10.1
+  - pip:
+    - pytorch_lightning
