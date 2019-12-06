@@ -48,9 +48,8 @@ class Unet(pl.LightningModule):
                 if bilinear:
                     self.up = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
                 else:
-                    self.up = nn .Upsample(in_channels // 2,
-                                           in_channels // 2,
-                                           kernel_size=2, stride=2)
+                    self.up = nn.ConvTranpose2d(in_channels // 2, in_channels // 2,
+                                                kernel_size=2, stride=2)
 
                 self.conv = double_conv(in_channels, out_channels)
 
@@ -93,7 +92,6 @@ class Unet(pl.LightningModule):
         y_hat = self.forward(x)
         loss = F.cross_entropy(y_hat, y) if self.n_classes > 1 else \
             F.binary_cross_entropy_with_logits(y_hat, y)
-        # loss = F.cross_entropy(y_hat, y)
         tensorboard_logs = {'train_loss': loss}
         return {'loss': loss, 'log': tensorboard_logs}
 
@@ -113,7 +111,8 @@ class Unet(pl.LightningModule):
         return torch.optim.RMSprop(self.parameters(), lr=0.1, weight_decay=1e-8)
 
     def __dataloader(self):
-        dataset = DirDataset('./dataset/carvana/train', './dataset/carvana/train_masks')
+        dataset = self.hparams.dataset
+        dataset = DirDataset(f'./dataset/{dataset}/train', f'./dataset/{dataset}/train_masks')
         n_val = int(len(dataset) * 0.1)
         n_train = len(dataset) - n_val
         train_ds, val_ds = random_split(dataset, [n_train, n_val])
@@ -137,6 +136,6 @@ class Unet(pl.LightningModule):
     def add_model_specific_args(parent_parser):
         parser = ArgumentParser(parents=[parent_parser])
 
-        parser.add_argument('--n_channels', default=3)
-        parser.add_argument('--n_classes', default=1)
+        parser.add_argument('--n_channels', type=int, default=3)
+        parser.add_argument('--n_classes', type=int, default=1)
         return parser

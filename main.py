@@ -13,22 +13,22 @@ from pytorch_lightning.logging import TestTubeLogger
 def main(hparams):
     model = Unet(hparams)
 
-    checkpoint_callback = ModelCheckpoint(
-        filepath=os.getcwd(),
-        save_best_only=False,
-        verbose=True,
-        monitor='loss',
-        mode='min',
-        prefix='unet-'
-    )
-    logger = TestTubeLogger(
-        save_dir='./lightning_logs',
-        version=1,
-    )
+    # checkpoint_callback = ModelCheckpoint(
+    #     filepath=os.getcwd(),
+    #     save_best_only=False,
+    #     verbose=True,
+    #     monitor='loss',
+    #     mode='min',
+    #     prefix='unet-'
+    # )
+    # logger = TestTubeLogger(
+    #     save_dir='./lightning_logs',
+    #     version=1,
+    # )
     trainer = Trainer(
         gpus=1,
-        checkpoint_callback=checkpoint_callback,
-        logger=logger,
+        # checkpoint_callback=checkpoint_callback,
+        # logger=logger,
     )
 
     trainer.fit(model)
@@ -36,6 +36,8 @@ def main(hparams):
 
 if __name__ == '__main__':
     parent_parser = ArgumentParser(add_help=False)
+    parent_parser.add_argument('--dataset', required=True)
+
     parser = Unet.add_model_specific_args(parent_parser)
     hparams = parser.parse_args()
 

@@ -42,11 +42,11 @@ class DirDataset(Dataset):
 
     def __getitem__(self, i):
         idx = self.ids[i]
-        img_files = glob.glob(os.path.join(self.img_dir, idx+'*'))
-        mask_files = glob.glob(os.path.join(self.mask_dir, idx+'*'))
+        img_files = glob.glob(os.path.join(self.img_dir, idx+'.*'))
+        mask_files = glob.glob(os.path.join(self.mask_dir, idx+'_mask.*'))
 
-        assert len(img_files) == 1
-        assert len(mask_files) == 1
+        assert len(img_files) == 1, f'{idx}: {img_files}'
+        assert len(mask_files) == 1, f'{idx}: {mask_files}'
 
         # use Pillow's Image to read .gif mask
         # https://answers.opencv.org/question/185929/how-to-read-gif-in-python/
