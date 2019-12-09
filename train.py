@@ -12,6 +12,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 def main(hparams):
     model = Unet(hparams)
 
+    os.makedirs(hparams.log_dir, exist_ok=True)
     try:
         log_dir = sorted(os.listdir(hparams.log_dir))[-1]
     except IndexError:
