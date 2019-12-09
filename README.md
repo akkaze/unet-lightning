@@ -1,7 +1,7 @@
 [pytorch-lightning](https://github.com/williamFalcon/pytorch-lightning) version of [Unet](https://arxiv.org/abs/1505.04597).
 
 
-![misc/carvana.png](demo of carvana)
+![demo of carvana](misc/carvana.png)
 
 
 ## Train
