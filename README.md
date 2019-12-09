@@ -1,11 +1,14 @@
 [pytorch-lightning](https://github.com/williamFalcon/pytorch-lightning) version of [Unet](https://arxiv.org/abs/1505.04597).
 
+[//]: # (demo of carvana)
+[//]: # (demo of nerve)
+
 
 ## Train
 
 + Put your dataset in `dataset/{dataset_name}`:
-    + `train`: contains image names
-    + `train_masks`: contains image masks
+    + `train`: contains image names (eg `001.jpg`)
+    + `train_masks`: contains image masks (eg `001_mask.tif`)
 
 + Sample with `carvana` dataset:
 
