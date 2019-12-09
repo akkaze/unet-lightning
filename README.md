@@ -1,7 +1,7 @@
 [pytorch-lightning](https://github.com/williamFalcon/pytorch-lightning) version of [Unet](https://arxiv.org/abs/1505.04597).
 
-[//]: # (demo of carvana)
-[//]: # (demo of nerve)
+
+![misc/carvana.png](demo of carvana)
 
 
 ## Train
@@ -10,7 +10,7 @@
     + `train`: contains image names (eg `001.jpg`)
     + `train_masks`: contains image masks (eg `001_mask.tif`)
 
-+ Sample with `carvana` dataset:
++ Sample with [carvana](https://www.kaggle.com/c/carvana-image-masking-challenge) dataset:
 
 ```
 python train.py --dataset carvana --n_channels 3

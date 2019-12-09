@@ -132,3 +132,4 @@ dataset/
 *.ipynb
 lightning_logs/
 result/
+kaggle/
